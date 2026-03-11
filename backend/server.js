@@ -14,6 +14,10 @@ import matchRoutes from './routes/matchRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
+import express from 'express';
+import cors from 'cors';
+import { connectDB } from './config/db.js';
+import userRoutes from './routes/userRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
@@ -35,6 +39,10 @@ app.use('/request', requestRoutes);
 app.use('/chat', chatRoutes);
 app.use('/report', reportRoutes);
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/user', userRoutes);
+
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 app.use((err, req, res, next) => {
@@ -52,3 +60,4 @@ registerChatHandlers(io);
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
