@@ -846,33 +846,36 @@ export const OfferRoomDashboard = ({ onLogout, userEmail, onEditProfile }: Dashb
                     No suggested matches right now.
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {suggestions.map((s) => (
-                      <SuggestedMatchCard
-                        key={s.userId}
-                        suggestion={s}
-                        onInvite={() => {
-                          if (!selectedRoomId) return;
-                          setInviteBanner(null);
-                          inviteToConnect(s.userId, String(selectedRoomId))
-                            .then(async () => {
-                              setInviteBanner({
-                                ok: true,
-                                text: 'Invite sent. They can accept it from their Find dashboard under Requests Received.',
-                              });
-                              await reloadEverything();
-                              window.setTimeout(() => setInviteBanner(null), 6000);
-                            })
-                            .catch((err: any) => {
-                              const msg =
-                                err?.response?.data?.message ||
-                                err?.message ||
-                                'Could not send invite.';
-                              setInviteBanner({ ok: false, text: msg });
-                            });
-                        }}
-                      />
-                    ))}
+                  <div className="overflow-x-auto">
+                    <div className="flex gap-4">
+                      {suggestions.map((s) => (
+                        <div key={s.userId} className="w-[260px] flex-shrink-0">
+                          <SuggestedMatchCard
+                            suggestion={s}
+                            onInvite={() => {
+                              if (!selectedRoomId) return;
+                              setInviteBanner(null);
+                              inviteToConnect(s.userId, String(selectedRoomId))
+                                .then(async () => {
+                                  setInviteBanner({
+                                    ok: true,
+                                    text: 'Invite sent. They can accept it from their Find dashboard under Requests Received.',
+                                  });
+                                  await reloadEverything();
+                                  window.setTimeout(() => setInviteBanner(null), 6000);
+                                })
+                                .catch((err: any) => {
+                                  const msg =
+                                    err?.response?.data?.message ||
+                                    err?.message ||
+                                    'Could not send invite.';
+                                  setInviteBanner({ ok: false, text: msg });
+                                });
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
