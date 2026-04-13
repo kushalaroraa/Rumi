@@ -28,7 +28,7 @@ import {
   PenLine,
   Lock,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
