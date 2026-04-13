@@ -183,7 +183,8 @@ export async function getRecommendedRooms(req, res) {
     };
 
     let candidates = await Room.find(baseQuery)
-      .select('ownerUserId propertyType roomType location monthlyRent photoUrls roomDescription flatmatePreferences status viewsCount createdAt')
+      .select('ownerUserId propertyType roomType location monthlyRent photoUrls roomDescription flatmatePreferences status viewsCount createdAt contactPreferences')
+      .populate('ownerUserId', 'name phone photo profilePicture')
       .sort({ createdAt: -1 })
       .limit(candidateLimit)
       .lean();
@@ -199,12 +200,20 @@ export async function getRecommendedRooms(req, res) {
 
     const scored = candidates.map((room) => {
       const score = calculateMatchScore(user?.toObject?.() ?? user, room);
+      const owner = room.ownerUserId || null;
+      const ownerPhone = owner?.phone || null;
+      const ownerImage = owner?.photo || owner?.profilePicture || '';
       return {
         ...room,
         compatibility: score,
         matchScore: score,
         coverUrl: room?.photoUrls?.[0] || '',
         tags: buildTags(room, score),
+        owner: owner
+          ? { id: owner._id, name: owner.name || '', phone: ownerPhone, image: ownerImage }
+          : null,
+        enableChat: Boolean(room?.contactPreferences?.chatOption),
+        showPhoneNumber: Boolean(room?.contactPreferences?.phoneVisibility),
       };
     });
 

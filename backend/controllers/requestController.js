@@ -56,7 +56,7 @@ export async function sendRequest(req, res) {
       { fromUserId, toUserId, roomId: roomIdStr || null },
       { $set: { status: 'pending', respondedAt: null } },
       { new: true, upsert: true }
-    ).populate('toUserId', 'name age city photo profilePicture');
+    ).populate('toUserId', 'name age city phone photo profilePicture');
 
     // Auto-match: if the other user already liked you (pending reverse request),
     // mark both directions as accepted.
@@ -250,7 +250,7 @@ export async function receivedRequests(req, res) {
     })
       .populate(
         'fromUserId',
-        'name age city photo profilePicture bio budgetRange profession lifestylePreferences'
+        'name age city phone photo profilePicture bio budgetRange profession lifestylePreferences'
       )
       .populate('roomId', 'propertyType monthlyRent location coverUrl ownerUserId status')
       .sort({ createdAt: -1 })
@@ -273,6 +273,8 @@ export async function receivedRequests(req, res) {
 
     const enriched = list.map((r) => {
       const other = r.fromUserId || {};
+      // normalize an `image` property for frontend convenience
+      other.image = other.photo || other.profilePicture || other.image || '';
 
       if (room) {
         const compatibility = calculateRoomCompatibility(room, other);
@@ -333,7 +335,7 @@ export async function receivedAcceptedRequests(req, res) {
     })
       .populate(
         'fromUserId',
-        'name age city photo profilePicture bio budgetRange profession lifestylePreferences'
+        'name age city phone photo profilePicture bio budgetRange profession lifestylePreferences'
       )
       .populate('roomId', 'propertyType monthlyRent location coverUrl ownerUserId status')
       .sort({ createdAt: -1 })
@@ -356,6 +358,7 @@ export async function receivedAcceptedRequests(req, res) {
 
     const enriched = list.map((r) => {
       const other = r.fromUserId || {};
+      other.image = other.photo || other.profilePicture || other.image || '';
 
       if (room) {
         const compatibility = calculateRoomCompatibility(room, other);
@@ -415,7 +418,7 @@ export async function sentRequests(req, res) {
     })
       .populate(
         'toUserId',
-        'name age city photo profilePicture bio budgetRange profession lifestylePreferences'
+        'name age city phone photo profilePicture bio budgetRange profession lifestylePreferences'
       )
       .populate('roomId', 'propertyType monthlyRent location coverUrl ownerUserId status')
       .sort({ createdAt: -1 })
@@ -435,6 +438,7 @@ export async function sentRequests(req, res) {
 
     const enriched = list.map((r) => {
       const other = r.toUserId || {};
+      other.image = other.photo || other.profilePicture || other.image || '';
 
       if (room) {
         const compatibility = calculateRoomCompatibility(room, other);
