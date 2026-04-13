@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
@@ -18,8 +19,13 @@ import reportRoutes from './routes/reportRoutes.js';
 import roomRoutes from './routes/roomRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// `.env` is expected to be inside this folder (`backend/.env`).
-dotenv.config({ path: path.join(__dirname, '.env') });
+// Try to load `.env` from backend folder first, fall back to repository root.
+let envPath = path.join(__dirname, '.env');
+if (!fs.existsSync(envPath)) {
+  envPath = path.join(__dirname, '..', '.env');
+}
+dotenv.config({ path: envPath });
+console.log('Loaded env from', envPath);
 const PORT = process.env.PORT || 4000;
 
 await connectDB();
